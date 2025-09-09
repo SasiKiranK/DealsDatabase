@@ -7,15 +7,28 @@ CREATE TYPE customer_type AS ENUM ('customer','poster');
 CREATE TABLE customers (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
-    email TEXT UNIQUE,
+    email TEXT UNIQUE NOT NULL,
     mobile TEXT,
     customer_type customer_type NOT NULL DEFAULT 'customer',
     city TEXT,
     exact_location TEXT,
     is_shadowbanned BOOLEAN DEFAULT FALSE,
     deal_submission_count INTEGER DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE OR REPLACE FUNCTION set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_customers_updated_at
+BEFORE UPDATE ON customers
+FOR EACH ROW EXECUTE FUNCTION set_timestamp();
 
 -- Devices owned by a customer
 CREATE TABLE devices (
@@ -26,6 +39,7 @@ CREATE TABLE devices (
     push_token TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+CREATE INDEX idx_devices_customer ON devices(customer_id);
 
 CREATE TYPE payment_type AS ENUM ('credit_card','debit_card','upi','wallet','bank_account','coin');
 
@@ -38,6 +52,7 @@ CREATE TABLE payment_methods (
     details JSONB,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+CREATE INDEX idx_payment_methods_customer ON payment_methods(customer_id);
 
 -- Credit card details
 CREATE TABLE credit_cards (
