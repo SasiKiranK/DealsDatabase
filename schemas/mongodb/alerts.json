@@ -1,0 +1,21 @@
+{
+  "database": "alerts_service",
+  "collection": "alerts",
+  "schema": {
+    "user_id": "UUID reference to customer",
+    "type": "keyword|store|brand|category|price_drop|freebie",
+    "query": "string or array defining the alert target",
+    "threshold": {
+      "price_under": "decimal",
+      "drop_percent": "integer"
+    },
+    "channels": ["email", "mobile_push", "whatsapp", "telegram", "browser"],
+    "rating_filter": "Any|+1|+2|+3|+4|+5|Popular|FP",
+    "active": "boolean",
+    "created_at": "ISODate",
+    "updated_at": "ISODate"
+  },
+  "indexes": [
+    { "keys": { "user_id": 1, "active": 1 } }
+  ]
+}

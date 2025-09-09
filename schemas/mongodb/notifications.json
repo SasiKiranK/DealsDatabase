@@ -1,0 +1,15 @@
+{
+  "database": "notification_service",
+  "collection": "notifications",
+  "schema": {
+    "user_id": "UUID reference to customer",
+    "channel": "email|push|whatsapp|telegram|browser",
+    "title": "short title for notification",
+    "message": "body text",
+    "read": "boolean",
+    "created_at": "ISODate"
+  },
+  "indexes": [
+    { "keys": { "user_id": 1, "read": 1 } }
+  ]
+}
