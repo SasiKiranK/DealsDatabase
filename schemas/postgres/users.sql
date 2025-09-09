@@ -12,6 +12,8 @@ CREATE TABLE customers (
     customer_type customer_type NOT NULL DEFAULT 'customer',
     city TEXT,
     exact_location TEXT,
+    is_shadowbanned BOOLEAN DEFAULT FALSE,
+    deal_submission_count INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -93,3 +95,21 @@ CREATE TABLE memberships (
     details JSONB,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Hot-path cache of payment options
+CREATE TABLE user_payment_options_flat (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES customers(id),
+    type payment_type,
+    provider TEXT,
+    last4 TEXT,
+    expiry_month INTEGER,
+    expiry_year INTEGER,
+    status TEXT,
+    issuer TEXT,
+    network TEXT,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_user_payment_options_user ON user_payment_options_flat(user_id);
+CREATE INDEX idx_user_payment_options_status ON user_payment_options_flat(status);
+CREATE INDEX idx_user_payment_options_type ON user_payment_options_flat(type);
