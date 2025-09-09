@@ -26,7 +26,7 @@ CREATE TABLE deal_types (
 );
 
 -- Enumerations
-CREATE TYPE deal_status AS ENUM ('prohibited','active','expired');
+CREATE TYPE deal_status AS ENUM ('draft','moderation','live','expired','blocked','deleted');
 CREATE TYPE deal_environment AS ENUM ('online','instore');
 
 -- Core deals table
@@ -35,10 +35,12 @@ CREATE TABLE deals (
     title TEXT NOT NULL,
     product_name TEXT,
     product_id BIGINT,
+    brand TEXT,
     original_price NUMERIC(12,2),
     discounted_price NUMERIC(12,2),
     store_id INTEGER REFERENCES stores(id),
     link TEXT,
+    image_url TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     start_date TIMESTAMPTZ,
     expiry_date TIMESTAMPTZ,
@@ -47,8 +49,9 @@ CREATE TABLE deals (
     downvote_count INTEGER DEFAULT 0,
     comment_count INTEGER DEFAULT 0,
     comment_velocity NUMERIC(10,2) DEFAULT 0,
-    status deal_status NOT NULL DEFAULT 'active',
+    status deal_status NOT NULL DEFAULT 'draft',
     owner_id BIGINT,
+    original_owner_id BIGINT,
     category_id INTEGER REFERENCES categories(id),
     deal_type_id INTEGER REFERENCES deal_types(id),
     environment deal_environment,
