@@ -13,6 +13,7 @@ CREATE TABLE deal_metrics (
     upvotes INTEGER DEFAULT 0,
     downvotes INTEGER DEFAULT 0
 );
+CREATE INDEX idx_deal_metrics_deal_date ON deal_metrics(deal_id, date);
 
 -- Per-user daily metrics
 CREATE TABLE user_metrics (
@@ -24,3 +25,4 @@ CREATE TABLE user_metrics (
     votes_cast INTEGER DEFAULT 0,
     rewards_earned NUMERIC(12,2) DEFAULT 0
 );
+CREATE INDEX idx_user_metrics_user_date ON user_metrics(user_id, date);

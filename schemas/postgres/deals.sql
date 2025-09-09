@@ -40,13 +40,13 @@ CREATE TABLE store_aliases (
 -- Categories for organizing deals
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL
+    name TEXT NOT NULL UNIQUE
 );
 
 -- Deal types like product, membership, services, gift card, sample, freebies
 CREATE TABLE deal_types (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL
+    name TEXT NOT NULL UNIQUE
 );
 
 -- Core deals table
@@ -100,6 +100,9 @@ CREATE TABLE deals (
 CREATE UNIQUE INDEX uniq_deals_url_normalized ON deals(url_normalized);
 CREATE INDEX idx_deals_live ON deals(created_at)
     WHERE status = 'active' AND (expiry_date IS NULL OR expiry_date > NOW());
+CREATE INDEX idx_deals_store ON deals(store_id);
+CREATE INDEX idx_deals_category ON deals(category_id);
+CREATE INDEX idx_deals_type ON deals(deal_type_id);
 
 -- Tags like VFM, hot, loot, lightning, missed
 CREATE TABLE title_tags (
@@ -131,16 +134,18 @@ CREATE TABLE deal_clicks (
     referrer TEXT
 );
 CREATE INDEX idx_deal_clicks_deal ON deal_clicks(deal_id);
+CREATE INDEX idx_deal_clicks_user ON deal_clicks(user_id);
+CREATE INDEX idx_deal_clicks_user_time ON deal_clicks(user_id, clicked_at);
 
 -- Images associated with a deal
 CREATE TABLE deal_images (
     id BIGSERIAL PRIMARY KEY,
-    deal_id BIGINT REFERENCES deals(id),
-    storage_url TEXT,
+    deal_id BIGINT REFERENCES deals(id) ON DELETE CASCADE,
+    storage_url TEXT NOT NULL,
     is_primary BOOLEAN DEFAULT FALSE,
     sort_order INTEGER DEFAULT 0,
     alt_text TEXT,
-    source TEXT CHECK (source IN ('upload','store','screenshot')),
+    source TEXT NOT NULL CHECK (source IN ('upload','store','screenshot')),
     width INTEGER,
     height INTEGER,
     checksum TEXT,
