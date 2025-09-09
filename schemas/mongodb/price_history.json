@@ -1,0 +1,16 @@
+{
+  "database": "price_history_service",
+  "collection": "price_history",
+  "schema": {
+    "product_id": "UUID of the product or deal",
+    "store_id": "integer store identifier",
+    "date": "ISODate of the captured price",
+    "price": "decimal value",
+    "currency": "ISO currency code",
+    "source": "crawler|extension",
+    "verified": "boolean"
+  },
+  "indexes": [
+    { "keys": { "product_id": 1, "store_id": 1, "date": -1 } }
+  ]
+}
